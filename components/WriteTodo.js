@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, Text, TextInput, TouchableOpacity } from 'react-native';
+import moment from 'moment';
 const { Navigation } = require('react-native-navigation');
 import Textarea from 'react-native-textarea';
 class WriteTodo extends React.Component {
@@ -15,19 +16,21 @@ class WriteTodo extends React.Component {
 
   onChangeTitle = (text) => {
     this.state.title = text;
-    console.log(this.state.title)
   }
   
   onChangeSubtitle = (text) => {
     this.state.subtitle = text;
-    console.log(this.state.subtitle)
   }
 
   saveTodo = () => {
-    this.props.handler({
+    const todo = {
+      id:Math.floor(Date.now() / 1000),
       title:this.state.title,
-      subtitle:this.state.subtitle
-    });
+      subtitle:this.state.subtitle,
+      checked:false,
+      date:moment().format('MMMM D, Y')
+    }
+    this.props.handler(todo);
     Navigation.dismissModal(this.props.componentId);
   }
   

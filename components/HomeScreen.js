@@ -5,6 +5,10 @@ import moment from 'moment';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Todolist from './Todolist';
 const { Navigation } = require('react-native-navigation');
+// const Realm = require('realm');
+import { insertNewTodoList,queryAllTodoList,disableTodo } from './Database';
+// import Realm from './Database  ';
+
 
 
 class HomeScreen extends React.Component {
@@ -17,34 +21,52 @@ class HomeScreen extends React.Component {
 
     // Set some state
     this.state = {
-        todo : [
-          {
-            title: 'Learn React Native',
-            subtitle: 'Do something hooks',
-            checked:false
-          }
-        ],
+        todoList:[],
         date : ''
     };
+
+    this.reloadData();
   }
 
   componentDidMount() {
-    var that = this;
-    that.setState({
+    console.log(`date = "${moment().format("MMMM D, Y")}"`);
+    this.setState({
       date: moment().format('MMMM D, Y')
     })
   }
 
-  handler(newTodo) {
-    console.log(newTodo.title);
-    this.setState({
-      todo: [
-        ...this.state.todo,newTodo
-      ]
-    })
+  reloadData = () =>{
+    queryAllTodoList().then((todoList)=>{
+      this.setState({todoList});
+    }).catch((error) => {
+      this.setState({todoList: []});
+    });
+    
   }
 
+  writeData = (newTodoList) => {
+    
+    insertNewTodoList(newTodoList).then().catch((error) => {
+      alert(`Failed to add todolist ${error}`);
+    });
+  }
+
+  disabledTodo = (key) => {
+    disableTodo(key).then().catch((error) => {
+        alert(`Failed ${key}`);
+    });
+    this.reloadData();
+  }
+
+  handler(newTodo) {
+    this.writeData(newTodo);
+    this.reloadData();
+    console.log(this.state.todoList);
+  }
+  
+
   render(){
+    
     return(
         <View style={styles.container}>
         <View style={{flex:80}}>
@@ -54,7 +76,7 @@ class HomeScreen extends React.Component {
           </View>
           <View style={{flex:60}}>
             <ScrollView>
-              <Todolist list={this.state.todo}/>
+              <Todolist list={this.state.todoList} disabledTodo = {this.disabledTodo}/>
             </ScrollView>
           </View>
         </View>
@@ -67,7 +89,7 @@ class HomeScreen extends React.Component {
                       component: {
                         name: 'Write',
                         passProps: {
-                          handler : this.handler
+                          handler : this.handler,
                         },
                         options: {
                           topBar: {
