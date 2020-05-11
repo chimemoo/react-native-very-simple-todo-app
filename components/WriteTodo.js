@@ -3,6 +3,7 @@ import { View, StyleSheet, Text, TextInput, TouchableOpacity } from 'react-nativ
 import moment from 'moment';
 const { Navigation } = require('react-native-navigation');
 import Textarea from 'react-native-textarea';
+
 class WriteTodo extends React.Component {
 
   constructor(props) {
@@ -12,6 +13,12 @@ class WriteTodo extends React.Component {
       subtitle : ''
     }
     this.props = props;
+    this.input = React.createRef();
+    
+  }
+
+  componentDidMount(){
+    this.input.current.focus();
   }
 
   onChangeTitle = (text) => {
@@ -39,6 +46,7 @@ class WriteTodo extends React.Component {
         <View style={styles.container}>
             <View style={{flex:20, paddingHorizontal:20, justifyContent:'center'}}>
               <TextInput
+                ref={this.input}
                 style={styles.titleText}
                 placeholder='Title'
                 defaultValue={this.state.title}
